@@ -26,10 +26,15 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT || 5432,
 });
+//console.log(`process.env.DB_PASSWORD: ${process.env.DB_PASSWORD}`);
 
 // Create Notes Table if it Doesn't Exist
 const createTable = async () => {
+  console.log();
   try {
+    const client = await pool.connect();
+    console.log("✅ Database connected successfully!");
+    client.release();
     await pool.query(`
       CREATE TABLE IF NOT EXISTS notes (
         id UUID PRIMARY KEY,
@@ -91,12 +96,13 @@ app.delete("/api/notes/:id", async (req, res) => {
 
 // 🟢 Hocuspocus Server for Real-time Collaboration
 const hocuspocus = new Hocuspocus({
+  host: "0.0.0.0",
   port: 1234, // Port for WebSocket connections
 });
 
 // Start Express Server
-app.listen(PORT, () =>
-  console.log(`🚀 Server running on http://192.168.1.42:${PORT}`)
+app.listen(PORT, "0.0.0.0", () =>
+  console.log(`🚀 Server running on http://0.0.0.0:${PORT}`)
 );
 
 // Start Hocuspocus Server
